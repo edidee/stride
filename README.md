@@ -1,8 +1,5 @@
-# Vue 3 + Vite
+# Stride
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+The figma project we are to use is at [figma](https://www.figma.com/file/zpIrpQEBkLQXD5Vq6C0k7O?embed_host=twitter&kind=&node-id=0%3A1&viewer=1). You canadd your bootstrap files.
 
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
-"# stride" 
+"# stride"
