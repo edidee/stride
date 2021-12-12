@@ -37,7 +37,7 @@
     </center>
     <center class="flex h-full justify-center items-center" v-else>
       <div class="flex items-center justify-center">
-        <p>Tap on '</p>
+        <p>Click on '</p>
         <span
           ><svg
             xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@
               clip-rule="evenodd"
             /></svg
         ></span>
-        <p>Account' to begin.</p>
+        <p>Account' to link financial account.</p>
       </div>
     </center>
     <!-- Code ends here -->
