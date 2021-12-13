@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen">
-    <p class="font-semibold text-xl p-4">Hi, {{ $store.state.account.name }}</p>
+    <p class="font-semibold text-xl p-4">Hi, {{ $store.state.user == null ? 'Boss. Please Login' : $store.state.user.displayName }}</p>
     <!-- Code starts here -->
     <center v-if="$store.state.monoid != 0" class="">
       <!-- Card -->
@@ -35,10 +35,8 @@
         </div>
       </div>
     </center>
-    <center class="flex h-full justify-center items-center" v-else>
-      <div class="flex items-center justify-center">
-        <p>Tap on '</p>
-        <span
+    <center v-if="$store.state.user != null && $store.state.monoid == 0">
+        <button @click="launchMono" class="flex items-center justify-center space-x-2 bg-blue-400 p-4 shadow-md rounded-lg"> <span
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-5 w-5"
@@ -50,9 +48,10 @@
               d="M10.496 2.132a1 1 0 00-.992 0l-7 4A1 1 0 003 8v7a1 1 0 100 2h14a1 1 0 100-2V8a1 1 0 00.496-1.868l-7-4zM6 9a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1zm3 1a1 1 0 012 0v3a1 1 0 11-2 0v-3zm5-1a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1z"
               clip-rule="evenodd"
             /></svg
-        ></span>
-        <p>Account' to begin.</p>
-      </div>
+        ></span> <p>Connect Bank to Begin</p> </button>
+    </center>
+    <center class="flex h-full justify-center items-center" v-if="$store.state.user == null">
+        <login />
     </center>
     <!-- Code ends here -->
   </div>
@@ -60,12 +59,79 @@
 
 <script>
 import moment from 'moment'
+import login from '../widgets/login.vue';
+import { Mono } from "mono-node";
+import store from "../../store";
+
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import firebaseConfig from "../../firebaseConfig";
+import { collection, doc, setDoc } from "firebase/firestore"; 
+// set the secret key
+const monoClient = new Mono({
+  secretKey: "test_sk_2leTB5EhetRgEqMt6gsO",
+});
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore();
+
+const userRef = collection(db, "users");
 
 export default {
+  components: { login },
     methods: {
         momentize(val){
             return moment(val).fromNow()
-        }
+        },
+
+        launchMono() {
+      const options = {
+        onSuccess: function (response) {
+          // get account id for connection
+          async function accIdCallback(err, results) {
+            // Handle errors
+            if (err) {
+              console.log(err);
+            }
+            if (results) {
+                // Baba is here
+              console.log(results.id);
+
+            //   Store in firestore
+            await setDoc(doc(userRef, store.state.user.uid), {
+                bank_code: results.id
+                 });
+
+            // Store in state
+              store.commit("setid", results.id);
+              monoClient.account.getAccountInformation(
+                { accountId: results.id },
+                (err, res) => {
+                  store.commit("setaccount", res.account);
+                }
+              );
+
+              monoClient.account.getAccountTransactions(
+                {
+                  accountId: results.id,
+                  paginate: true,
+                },
+                (err, results) => {
+                  store.commit("setstatement", results.data);
+                }
+              );
+            }
+          }
+
+          monoClient.auth.getAccountId(response, accIdCallback);
+        },
+
+        onClose: function () {
+          
+        },
+      };
+      this.$launchMono(options);
+    },
     }
 };
 </script>

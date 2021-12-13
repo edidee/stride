@@ -10,6 +10,9 @@ const store = createStore({
     }
   },
   mutations: {
+    setuser(state, payload) {
+      state.user = payload;
+    },
     setid(state, payload) {
       state.monoid = payload;
     },
